@@ -93,6 +93,11 @@ public abstract class FluentAPI<T> {
         });
     }
 
+    public final <R> FluentAPI<R> mapCustom(FF<@NN ? super T, @NN ? extends R> mapper) {
+        return create(consumer -> {
+            produce(v -> consumer.accept(mapper.m(v)));
+        });
+    }
 
     public final <R> FluentAPI<R> flatMapOptional(Function<? super T, Optional<? extends R>> mapper) {
         return create(consumer -> {
@@ -187,6 +192,11 @@ public abstract class FluentAPI<T> {
 
     @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
     @Retention(RetentionPolicy.RUNTIME)
-    @interface NN {
+    public @interface NN {
+    }
+
+    @FunctionalInterface
+    public interface FF<T, R> {
+        R m(T t);
     }
 }

@@ -16,6 +16,7 @@
 
 package hu.akarnokd.android.desugarcheck;
 
+import java.lang.annotation.*;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
@@ -85,6 +86,13 @@ public abstract class FluentAPI<T> {
             produce(v -> mapper.apply(v).forEach(consumer));
         });
     }
+
+    public final <R> FluentAPI<R> mapNotNull(Function<@NN ? super T, @NN ? extends R> mapper) {
+        return create(consumer -> {
+            produce(v -> consumer.accept(mapper.apply(v)));
+        });
+    }
+
 
     public final <R> FluentAPI<R> flatMapOptional(Function<? super T, Optional<? extends R>> mapper) {
         return create(consumer -> {
@@ -175,5 +183,10 @@ public abstract class FluentAPI<T> {
         ScheduledExecutorService exec = Executors.newScheduledThreadPool(1);
         ((ScheduledThreadPoolExecutor)exec).setRemoveOnCancelPolicy(true);
         return exec;
+    }
+
+    @Target({ElementType.TYPE_USE, ElementType.TYPE_PARAMETER})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface NN {
     }
 }

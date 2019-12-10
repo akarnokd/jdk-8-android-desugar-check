@@ -32,7 +32,7 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
+apply plugin: 'java-library'
 apply plugin: 'eclipse'
 apply plugin: "me.champeau.gradle.jmh"
 apply plugin: 'pmd'
@@ -66,7 +66,7 @@ apply plugin: 'maven-publish'
 dependencies {
     signature 'org.codehaus.mojo.signature:java18:1.0@signature'
 
-    testCompile group: 'junit', name: 'junit', version: junitVersion
+    testImplementation group: 'junit', name: 'junit', version: junitVersion
 }
 
 apply plugin: 'biz.aQute.bnd.builder'
@@ -172,10 +172,18 @@ check.dependsOn pmdPrint
 
 apply plugin: "com.vanniktech.maven.publish"
 
+task('sourceJar', type: Jar, dependsOn: classes) {
+   classifier = 'sources'
+   from sourceSets.main.allSource
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
+            artifact sourceJar {
+              classifier "sources"
+            }
         }
     }
     repositories {
